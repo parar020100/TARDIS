@@ -21,3 +21,10 @@ ENT:AddHook("FailDemat", "time_distortions", function(self, force)
 
 end)
 
+
+ENT:AddHook("CanMat", "time_distortions", function(self)
+	if TimeDistortionsPresent(self.interior:GetPos(), self.metadata.Interior.ExitDistance)
+	then
+		return false
+	end
+end)
