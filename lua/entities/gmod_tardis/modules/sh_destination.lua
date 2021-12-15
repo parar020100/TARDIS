@@ -1,22 +1,5 @@
 -- Destination
 
-TARDIS:AddControl({
-	id = "destination",
-	ext_func=function(self,ply)
-		self:SelectDestination(ply, true)
-	end,
-	serveronly=true,
-	screen_button = {
-		virt_console = false,
-		mmenu = true,
-		toggle = false,
-		frame_type = {0, 1},
-		text = "Destination",
-		order = 4,
-	},
-	tip_text = "Destination Select",
-})
-
 -- Binds
 
 TARDIS:AddKeyBind("destination-open",{
@@ -25,7 +8,7 @@ TARDIS:AddKeyBind("destination-open",{
 	desc="Enter destination select state",
 	func=function(self,down,ply)
 		if down and ply == self.pilot then
-			self:SelectDestination(ply, true)
+			TARDIS:Control("destination", ply)
 		end
 	end,
 	key=KEY_H,
@@ -83,7 +66,7 @@ TARDIS:AddKeyBind("destination-boost",{
 	exterior=true
 })
 TARDIS:AddKeyBind("destination-slow",{
-	name="Rotate",
+	name="Slow",
 	section="Destination",
 	desc="Hold this key to slow movement",
 	key=KEY_LALT,

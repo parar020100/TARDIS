@@ -1,36 +1,17 @@
 -- Cloak
 
-TARDIS:AddControl({
-	id = "cloak",
-	ext_func=function(self,ply)
-		self:ToggleCloak()
-	end,
-	serveronly=true,
-	screen_button = {
-		virt_console = true,
-		mmenu = false,
-		toggle = true,
-		frame_type = {0, 1},
-		text = "Cloaking",
-		pressed_state_from_interior = false,
-		pressed_state_data = "cloak",
-		order = 12,
-	},
-	tip_text = "Cloaking Device",
-})
-
 
 TARDIS:AddKeyBind("cloak-toggle",{
 	name="Toggle",
 	section="Cloak",
 	func=function(self,down,ply)
 		if ply == self.pilot and down then
-			self:ToggleCloak()
+			TARDIS:Control("cloak", ply)
 		end
 	end,
 	key=KEY_L,
 	serveronly=true,
-	exterior=true	
+	exterior=true
 })
 
 ENT:AddHook("Initialize", "cloak", function(self)
@@ -56,6 +37,9 @@ if SERVER then
 		self:SendMessage("cloak", function()
 			net.WriteBool(on)
 		end)
+		if (not self:GetData("teleport")) and (not self:GetData("vortex")) then
+			self:DrawShadow(not on)
+		end
 		return true
     end
     
@@ -204,17 +188,23 @@ else
 		if self:GetData("cloak",false) and not self:GetData("cloak-animating",false) then return false end
 	end)
 
-    ENT:OnMessage("cloak", function(self)
+	ENT:OnMessage("cloak", function(self)
 		local on = net.ReadBool()
 		self:SetData("cloak", on)
 		self:SetData("cloak-animating", true)
-        local snd = self.metadata.Exterior.Sounds.Cloak
-        if on and TARDIS:GetSetting("cloaksound-enabled") and TARDIS:GetSetting("sound") then
-            self:EmitSound(snd)
+		local snd
+		if on then
+			snd = self.metadata.Exterior.Sounds.Cloak
+		else
+			snd = self.metadata.Exterior.Sounds.CloakOff
+		end
 
-            if IsValid(self.interior) then
-                self.interior:EmitSound(snd)
-            end
-        end
-    end)
+		if TARDIS:GetSetting("cloaksound-enabled") and TARDIS:GetSetting("sound") then
+			self:EmitSound(snd)
+
+			if IsValid(self.interior) then
+				self.interior:EmitSound(snd)
+			end
+		end
+	end)
 end
